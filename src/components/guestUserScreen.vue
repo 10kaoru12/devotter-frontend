@@ -5,7 +5,7 @@
         <v-img :src="require('../assets/thai monk.svg')" class="my-3" contain height="200"></v-img>
         <h1>
           「Devotter」
-          <br />その精進、
+          <br />その精進
           <br />ツイートしませんか
         </h1>
         <br />
@@ -21,9 +21,16 @@
 </template>
 
 <script>
+
+import firebase from 'firebase';
+
 export default {
   name: "guestUserScreen",
-  methods:{
+  methods: {
+    signin: function() {
+      const provider = new firebase.auth.TwitterAuthProvider();
+      firebase.auth().signInWithPopup(provider);
+    }
   }
 };
 </script>
