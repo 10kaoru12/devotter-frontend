@@ -1,9 +1,15 @@
 <template>
-  <v-container>
-    <v-layout text-center wrap justify-center>
+  <v-container fluid fill-height>
+    <v-layout align-center text-center wrap>
       <v-flex xs12>
         <v-img :src="require('../assets/thai monk.svg')" class="my-3" contain height="200"></v-img>
-        <v-btn>Signin Twitter</v-btn>
+        <h1>「Devotter」</h1>
+        <h5>
+          このアプリケーションは、1日1回AtCoderでのAC数を
+          <br />Twitterにツイートしてくれるアプリケーションです。
+        </h5>
+        <br />
+        <v-btn color="#00acee">Signin Twitter</v-btn>
       </v-flex>
     </v-layout>
   </v-container>
@@ -11,7 +17,7 @@
 
 <script>
 export default {
-  name: "HelloWorld",
+  name: "guestUserScreen",
 
   data: () => ({
     //
