@@ -2,6 +2,7 @@
   <v-container pa-12 fill-height>
     <v-layout align-center text-center wrap>
       <v-flex xs12>
+        <v-alert v-model="alert" type="error" dismissible>無効なAtCoderIDです。</v-alert>
         <v-img :src="require('../assets/thai monk.svg')" class="my-3" contain height="200"></v-img>
         <h1>「Devotter」</h1>
         <h2>
@@ -17,11 +18,11 @@
             type="text"
             v-model="atcoderId"
             label="AtCoderID"
+            color="green"
             required
           ></v-text-field>
         </v-form>
         <v-btn @click="signin" v-bind:disabled="isnull" color="#00acee" rounded>Signin To Twitter</v-btn>
-        {{userInfo}}
       </v-flex>
     </v-layout>
   </v-container>
@@ -35,35 +36,33 @@ export default {
   name: "guestUserScreen",
   methods: {
     signin: function() {
-      const provider = new firebase.auth.TwitterAuthProvider();
-      firebase.auth().signInWithRedirect(provider);
-      // .then(function(result) {
-      //   var token = result.credential.accessToken;
-      //   var secret = result.credential.secret;
-      // });
+      axios
+        .get(this.userApi + this.atcoderId)
+        .then(response => {
+          this.userInfo = response;
+          const provider = new firebase.auth.TwitterAuthProvider();
+          firebase.auth().signInWithRedirect(provider);
+          // .then(function(result) {
+          //   var token = result.credential.accessToken;
+          //   var secret = result.credential.secret;
+          // });
+        })
+        .catch(() => {
+          this.alert=true;
+          this.userInfo = "無効なAtCoderID名です。";
+        });
     },
     changeField: function() {
       !this.atcoderId ? (this.isnull = true) : (this.isnull = false);
-
     }
-  },
-  created: function() {
-    axios
-      .get("https://kenkoooo.com/atcoder/resources/ac.json")
-      .then(response => {
-        this.userInfo = response;
-      })
-      .catch(() => {
-        this.userInfo = "無効なAtCoderID名です。";
-      });
-    // eslint-disable-next-line no-console
-    console.log(this.userInfo);
   },
   data: function() {
     return {
       atcoderId: "",
       isnull: true,
-      userInfo: ""
+      userInfo: "",
+      userApi: "https://kenkoooo.com/atcoder/atcoder-api/v2/user_info?user=",
+      alert: false
     };
   }
 };
