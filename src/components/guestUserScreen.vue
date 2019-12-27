@@ -41,7 +41,7 @@ export default {
         .then(response => {
           this.userInfo = response;
           const provider = new firebase.auth.TwitterAuthProvider();
-          firebase.auth().signInWithRedirect(provider);
+          firebase.auth().signInWithPopup(provider);
           // .then(function(result) {
           //   var token = result.credential.accessToken;
           //   var secret = result.credential.secret;
