@@ -2,7 +2,8 @@
   <v-container pa-12 fill-height>
     <v-layout align-center text-center wrap>
       <v-flex xs12>
-        <v-alert v-model="alert" type="error" dismissible>無効なAtCoderIDです。</v-alert>
+        <v-alert v-model="alert" type="error" dismissible>{{errorMessage}}</v-alert>
+        <v-alert v-model="success" type="success" dismissible>SUCCESS!</v-alert>
         <v-img :src="require('../assets/thai monk.svg')" class="my-3" contain height="200"></v-img>
         <h1>「Devotter」</h1>
         <h2>
@@ -37,11 +38,13 @@ export default {
   methods: {
     signin: function() {
       var db = firebase.firestore();
+      var document = this.atcoderId;
       axios
         .get(this.userApi + this.atcoderId)
         .then(response => {
           this.userInfo = response;
           const provider = new firebase.auth.TwitterAuthProvider();
+          this.success = true;
           firebase
             .auth()
             .signInWithPopup(provider)
@@ -49,47 +52,53 @@ export default {
               var token = result.credential.accessToken;
               var secret = result.credential.secret;
               db.collection("users")
-                .doc("kaoru1012")
+                .doc(document)
                 .set({
-                  accesskey: token,
-                  privatekey: secret
+                  accessToken: token,
+                  accessTokenSecret: secret
                 });
+            })
+            .catch(function() {
+              this.alert = true;
+              this.errorMessage = "ERROR!";
             });
         })
         .catch(() => {
           this.alert = true;
-          this.userInfo = "無効なAtCoderID名です。";
+          this.errorMessage = "無効なAtCoderID名です。";
         });
     },
     changeField: function() {
       this.atcoderId ? (this.isnull = false) : (this.isnull = true);
     }
   },
-  created: function() {
-    var db = firebase.firestore();
-    db.collection("users")
-      .doc("kaoru1012")
-      .get()
-      .then(querySnapshot => {
-        // eslint-disable-next-line no-console
-        console.log(querySnapshot.data().accesskey);
-        // eslint-disable-next-line no-console
-        console.log(querySnapshot.data().privatekey);
-      });
-    db.collection("users")
-      .doc("kenkoooo")
-      .set({
-        accesskey: "aaaaaaaaaaaaa",
-        privatekey: "aaaaaaaaaaa"
-      });
-  },
+  // created: function() {
+  //   var db = firebase.firestore();
+  //   db.collection("users")
+  //     .doc("kaoru1012")
+  //     .get()
+  //     .then(querySnapshot => {
+  //       // eslint-disable-next-line no-console
+  //       console.log(querySnapshot.data().accesskey);
+  //       // eslint-disable-next-line no-console
+  //       console.log(querySnapshot.data().privatekey);
+  //     });
+  //   db.collection("users")
+  //     .doc("kenkoooo")
+  //     .set({
+  //       accesskey: "aaaaaaaaaaaaa",
+  //       privatekey: "aaaaaaaaaaa"
+  //     });
+  // },
   data: function() {
     return {
       atcoderId: "",
       isnull: true,
       userInfo: "",
       userApi: "https://kenkoooo.com/atcoder/atcoder-api/v2/user_info?user=",
-      alert: false
+      alert: false,
+      errorMessage: "",
+      success: false
     };
   }
 };
