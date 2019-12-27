@@ -19,11 +19,11 @@
             type="text"
             v-model="atcoderId"
             label="AtCoderID"
-            color="green"
+            color="#00acee"
             required
           ></v-text-field>
         </v-form>
-        <v-btn @click="signin" v-bind:disabled="isnull" color="#00acee" rounded>Signin To Twitter</v-btn>
+        <v-btn @click="signin" v-bind:disabled="isnull" color="#00acee" rounded>Sign In To Twitter</v-btn>
       </v-flex>
     </v-layout>
   </v-container>
@@ -49,8 +49,8 @@ export default {
             .auth()
             .signInWithPopup(provider)
             .then(function(result) {
-              var token = result.credential.accessToken;
-              var secret = result.credential.secret;
+              let token = result.credential.accessToken;
+              let secret = result.credential.secret;
               db.collection("users")
                 .doc(document)
                 .set({
