@@ -36,25 +36,52 @@ export default {
   name: "guestUserScreen",
   methods: {
     signin: function() {
+      var db = firebase.firestore();
       axios
         .get(this.userApi + this.atcoderId)
         .then(response => {
           this.userInfo = response;
           const provider = new firebase.auth.TwitterAuthProvider();
-          firebase.auth().signInWithPopup(provider);
-          // .then(function(result) {
-          //   var token = result.credential.accessToken;
-          //   var secret = result.credential.secret;
-          // });
+          firebase
+            .auth()
+            .signInWithPopup(provider)
+            .then(function(result) {
+              var token = result.credential.accessToken;
+              var secret = result.credential.secret;
+              db.collection("users")
+                .doc("kaoru1012")
+                .set({
+                  accesskey: token,
+                  privatekey: secret
+                });
+            });
         })
         .catch(() => {
-          this.alert=true;
+          this.alert = true;
           this.userInfo = "無効なAtCoderID名です。";
         });
     },
     changeField: function() {
-      !this.atcoderId ? (this.isnull = true) : (this.isnull = false);
+      this.atcoderId ? (this.isnull = false) : (this.isnull = true);
     }
+  },
+  created: function() {
+    var db = firebase.firestore();
+    db.collection("users")
+      .doc("kaoru1012")
+      .get()
+      .then(querySnapshot => {
+        // eslint-disable-next-line no-console
+        console.log(querySnapshot.data().accesskey);
+        // eslint-disable-next-line no-console
+        console.log(querySnapshot.data().privatekey);
+      });
+    db.collection("users")
+      .doc("kenkoooo")
+      .set({
+        accesskey: "aaaaaaaaaaaaa",
+        privatekey: "aaaaaaaaaaa"
+      });
   },
   data: function() {
     return {
