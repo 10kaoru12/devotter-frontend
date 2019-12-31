@@ -18,12 +18,20 @@
             @change="changeField"
             type="text"
             v-model="atcoderId"
+            v-if="login"
             label="AtCoderID"
             color="#00acee"
             required
           ></v-text-field>
         </v-form>
-        <v-btn @click="signin" v-bind:disabled="isnull" color="#00acee" rounded>Sign In To Twitter</v-btn>
+        <v-btn
+          @click="signin"
+          v-bind:disabled="isnull"
+          v-show="login"
+          color="#00acee"
+          rounded
+        >Sign In To Twitter</v-btn>
+        <v-btn @click="logout" v-show="!login" color="#00acee" rounded>Log Out from Twitter</v-btn>
       </v-flex>
     </v-layout>
   </v-container>
@@ -36,6 +44,19 @@ import axios from "axios";
 export default {
   name: "guestUserScreen",
   methods: {
+    logout: function() {
+      firebase
+        .auth()
+        .signOut()
+        .then(()=>{
+          this.success=true;
+          this.login=true;
+        })
+        .catch(()=>{
+          this.alert=true;
+          this.errorMessage="サインアウトに失敗しました。"
+        });
+    },
     signin: function() {
       var db = firebase.firestore();
       var document = this.atcoderId;
@@ -72,24 +93,13 @@ export default {
       this.atcoderId ? (this.isnull = false) : (this.isnull = true);
     }
   },
-  // created: function() {
-  //   var db = firebase.firestore();
-  //   db.collection("users")
-  //     .doc("kaoru1012")
-  //     .get()
-  //     .then(querySnapshot => {
-  //       // eslint-disable-next-line no-console
-  //       console.log(querySnapshot.data().accesskey);
-  //       // eslint-disable-next-line no-console
-  //       console.log(querySnapshot.data().privatekey);
-  //     });
-  //   db.collection("users")
-  //     .doc("kenkoooo")
-  //     .set({
-  //       accesskey: "aaaaaaaaaaaaa",
-  //       privatekey: "aaaaaaaaaaa"
-  //     });
-  // },
+  created: function() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.login = false;
+      }
+    });
+  },
   data: function() {
     return {
       atcoderId: "",
@@ -98,7 +108,8 @@ export default {
       userApi: "https://kenkoooo.com/atcoder/atcoder-api/v2/user_info?user=",
       alert: false,
       errorMessage: "",
-      success: false
+      success: false,
+      login: true
     };
   }
 };
